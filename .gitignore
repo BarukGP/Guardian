@@ -1,6 +1,9 @@
-backend/venv/
-backend/.env
-backend/data/
+api-service/venv/
+api-service/.env
+api-service/data/
+web-client/node_modules/
+web-client/dist/
+web-client/.env
 __pycache__/
 *.pyc
 *.pyo

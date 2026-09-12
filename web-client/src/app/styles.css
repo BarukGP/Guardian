@@ -1,0 +1,8 @@
+@import "tailwindcss";
+@import "@fontsource-variable/manrope";
+@import "@fontsource/dm-mono";
+
+@theme {
+  --font-sans: "Manrope Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "DM Mono", ui-monospace, monospace;
+}

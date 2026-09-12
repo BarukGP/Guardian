@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 
 from app.models.schemas import RiskAssessment
 from app.risk_engine.state import TransactionEvent
-from app.risk_engine.stats import average_amount, events_within, total_amount
+from app.risk_engine.stats import average_amount, events_within, known_payees, total_amount
 
 
 HIGH_AMOUNT = 10_000.0
@@ -43,6 +43,36 @@ def assess_deposit(
     if len(history) >= 3 and amount >= historical_average * 3:
         score += 20
         reasons.append("Monto atípico: supera tres veces el promedio histórico.")
+
+    bounded_score = min(score, 100)
+    level = "high" if bounded_score >= 60 else "medium" if bounded_score >= 25 else "low"
+    if not reasons:
+        reasons.append("No se detectaron señales de riesgo con las reglas actuales.")
+
+    return RiskAssessment(score=bounded_score, level=level, reasons=reasons)
+
+
+def assess_transfer(
+    amount: float,
+    payee_id: str | None,
+    prior_events: list[TransactionEvent],
+    now: datetime | None = None,
+) -> RiskAssessment:
+    """Evalúa una transferencia tipo APP Fraud (Rosa Elena -> beneficiario).
+
+    Reutiliza velocidad/volumen/promedio de deposits y suma la señal clave
+    diferenciadora: beneficiario nuevo (+30).
+    """
+    current_time = now or datetime.now(timezone.utc)
+    # Base: mismas reglas de velocidad/volumen/promedio que deposits.
+    base = assess_deposit(amount, prior_events, current_time)
+    score = base.score
+    reasons = [r for r in base.reasons if "No se detectaron" not in r]
+
+    payees = known_payees(prior_events)
+    if payee_id and payee_id not in payees and len(prior_events) >= 1:
+        score += 30
+        reasons.append("Beneficiario nuevo: nunca se le había transferido antes.")
 
     bounded_score = min(score, 100)
     level = "high" if bounded_score >= 60 else "medium" if bounded_score >= 25 else "low"

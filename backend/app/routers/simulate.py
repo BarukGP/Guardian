@@ -48,9 +48,11 @@ def list_alerts(
 
 
 @router.websocket("/alerts/stream")
-async def stream_alerts(websocket: WebSocket) -> None:
+async def stream_alerts(
+    websocket: WebSocket, api_key: Annotated[str | None, Query()] = None
+) -> None:
     """Envía alertas nuevas por WebSocket mientras la conexión esté activa."""
-    if not await authorize_websocket(websocket):
+    if not await authorize_websocket(websocket, api_key):
         return
     await websocket.accept()
     last_alert_id = 0

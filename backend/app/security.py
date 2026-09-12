@@ -48,9 +48,18 @@ def require_api_key(
         )
 
 
-async def authorize_websocket(websocket: WebSocket) -> bool:
-    """Valida la misma clave API antes de aceptar una conexión WebSocket."""
-    if _is_valid_api_key(websocket.headers.get(API_KEY_HEADER_NAME)):
+async def authorize_websocket(websocket: WebSocket, api_key: str | None = None) -> bool:
+    """Valida la misma clave API antes de aceptar una conexión WebSocket.
+
+    Los browsers no pueden enviar headers custom en el handshake WS,
+    por eso se acepta también ``?api_key=`` como fallback al header.
+    """
+    provided = (
+        api_key
+        or websocket.query_params.get("api_key")
+        or websocket.headers.get(API_KEY_HEADER_NAME)
+    )
+    if _is_valid_api_key(provided):
         return True
     await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
     return False

@@ -43,6 +43,23 @@ class DepositWithRisk(BaseModel):
     risk: RiskAssessment
 
 
+class TransferCreate(BaseModel):
+    """Transferencia entre cuentas (caso APP Fraud: Rosa Elena -> estafador)."""
+
+    medium: Literal["balance", "rewards"] = "balance"
+    payee_id: str = Field(min_length=1, max_length=100)
+    amount: float = Field(gt=0)
+    transaction_date: date | None = None
+    description: str | None = Field(default=None, min_length=1, max_length=255)
+
+
+class TransferWithRisk(BaseModel):
+    """Transferencia creada y la evaluación de riesgo asociada."""
+
+    transfer: dict[str, Any]
+    risk: RiskAssessment
+
+
 class RiskAlert(BaseModel):
     """Alerta persistida en memoria para mostrar actividad sospechosa."""
 

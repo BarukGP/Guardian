@@ -25,3 +25,8 @@ def average_amount(events: Iterable[TransactionEvent]) -> float:
     """Calcula el importe medio, devolviendo cero cuando no hay historial."""
     values = list(events)
     return total_amount(values) / len(values) if values else 0.0
+
+
+def known_payees(events: Iterable[TransactionEvent]) -> set[str]:
+    """Devuelve los beneficiarios ya vistos en el historial."""
+    return {event.payee_id for event in events if event.payee_id}

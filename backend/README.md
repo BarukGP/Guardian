@@ -55,6 +55,8 @@ La documentación interactiva queda disponible en `http://127.0.0.1:8000/docs`.
 | `POST` | `/accounts/customers/{customer_id}` | Crea una cuenta. |
 | `GET` | `/transactions/accounts/{account_id}/deposits` | Lista los abonos de una cuenta. |
 | `POST` | `/transactions/accounts/{account_id}/deposits` | Registra un abono y devuelve su riesgo. |
+| `GET` | `/transactions/accounts/{account_id}/transfers` | Lista transferencias (caso APP Fraud). |
+| `POST` | `/transactions/accounts/{account_id}/transfers` | Registra transferencia y evalúa beneficiario nuevo + monto. |
 | `POST` | `/simulate/run` | Ejecuta la secuencia de demostración sin usar Nessie. |
 | `GET` | `/simulate/alerts` | Consulta alertas persistidas en SQLite. |
 | `WS` | `/simulate/alerts/stream` | Envía alertas nuevas en tiempo real. |
@@ -73,13 +75,14 @@ usa el botón **Authorize** para introducir la clave una vez por sesión.
 
 ## Motor de riesgo inicial
 
-Cada depósito creado pasa por reglas explicables y devuelve un puntaje de 0 a
-100, nivel (`low`, `medium` o `high`) y motivos. Las señales actuales son:
+Cada depósito o transferencia creada pasa por reglas explicables y devuelve
+un puntaje de 0 a 100, nivel (`low`, `medium` o `high`) y motivos. Señales:
 
 - monto individual alto (10,000 o más);
 - actividad rápida (tres o más movimientos previos en 10 minutos);
-- volumen acumulado alto en 10 minutos; y
-- monto que excede tres veces el promedio de los últimos 30 días.
+- volumen acumulado alto en 10 minutos;
+- monto que excede tres veces el promedio de los últimos 30 días; y
+- **solo transfers:** beneficiario nuevo (+30, señal APP Fraud).
 
 Los movimientos y alertas se guardan localmente en `backend/data/guardian.db`.
 La ruta se puede cambiar con `GUARDIAN_DATABASE_PATH`. SQLite es apropiado para
@@ -100,8 +103,9 @@ python scripts/simulate_stream.py
 ```
 
 Para recibir alertas nuevas en tiempo real, conecta un cliente WebSocket a
-`ws://127.0.0.1:8000/simulate/alerts/stream` e incluye el encabezado
-`X-Guardian-API-Key`.
+`ws://127.0.0.1:8000/simulate/alerts/stream?api_key=<GUARDIAN_API_KEY>`.
+Se acepta también el encabezado `X-Guardian-API-Key`, pero los browsers
+requieren el query param. CORS ya permite `http://localhost:5173`.
 
 ## Comprobar Nessie y cargar datos demo
 

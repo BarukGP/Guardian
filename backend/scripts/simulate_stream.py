@@ -5,7 +5,11 @@ Ejecutar desde ``backend``: ``python scripts/simulate_stream.py``.
 
 from __future__ import annotations
 
+import sys
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from app.models.schemas import SimulatedTransaction, SimulationResult
 from app.risk_engine.rules import assess_deposit
@@ -36,6 +40,8 @@ def run_simulation(
     reference_time = now or datetime.now(timezone.utc)
     simulation_state = state if state is not None else RiskState()
     persistence = store if store is not None else guardian_store
+    # Demo aislada y reproducible: parte de RiskState fresco cada corrida.
+    # /transactions en cambio usa el historial persistido (SQLite + Nessie).
     transactions: list[SimulatedTransaction] = []
     alerts_generated = 0
 

@@ -13,6 +13,7 @@ class TransactionEvent:
     account_id: str
     amount: float
     occurred_at: datetime
+    payee_id: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -41,13 +42,24 @@ class RiskState:
             self._prune(account_id, current_time)
             return list(self._events[account_id])
 
-    def record(self, account_id: str, amount: float, now: datetime | None = None) -> None:
-        """Registra un depósito ya creado exitosamente en Nessie."""
+    def record(
+        self,
+        account_id: str,
+        amount: float,
+        now: datetime | None = None,
+        payee_id: str | None = None,
+    ) -> None:
+        """Registra un movimiento ya creado exitosamente en Nessie."""
         current_time = now or datetime.now(timezone.utc)
         with self._lock:
             self._prune(account_id, current_time)
             self._events[account_id].append(
-                TransactionEvent(account_id=account_id, amount=amount, occurred_at=current_time)
+                TransactionEvent(
+                    account_id=account_id,
+                    amount=amount,
+                    occurred_at=current_time,
+                    payee_id=payee_id,
+                )
             )
 
     def clear(self) -> None:

@@ -19,14 +19,20 @@ class GuardianStore:
         self._database_path.parent.mkdir(parents=True, exist_ok=True)
         self._initialize()
 
-    def record_transaction(self, account_id: str, amount: float, occurred_at: datetime) -> None:
+    def record_transaction(
+        self,
+        account_id: str,
+        amount: float,
+        occurred_at: datetime,
+        payee_id: str | None = None,
+    ) -> None:
         with self._connect() as connection:
             connection.execute(
                 """
-                INSERT INTO transactions (account_id, amount, occurred_at)
-                VALUES (?, ?, ?)
+                INSERT INTO transactions (account_id, amount, occurred_at, payee_id)
+                VALUES (?, ?, ?, ?)
                 """,
-                (account_id, amount, occurred_at.isoformat()),
+                (account_id, amount, occurred_at.isoformat(), payee_id),
             )
 
     def events_for(
@@ -36,7 +42,7 @@ class GuardianStore:
         with self._connect() as connection:
             rows = connection.execute(
                 """
-                SELECT account_id, amount, occurred_at
+                SELECT account_id, amount, occurred_at, payee_id
                 FROM transactions
                 WHERE account_id = ? AND occurred_at >= ?
                 ORDER BY occurred_at ASC
@@ -48,6 +54,7 @@ class GuardianStore:
                 account_id=row["account_id"],
                 amount=float(row["amount"]),
                 occurred_at=datetime.fromisoformat(row["occurred_at"]),
+                payee_id=row["payee_id"] if "payee_id" in row.keys() else None,
             )
             for row in rows
         ]
@@ -115,7 +122,8 @@ class GuardianStore:
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     account_id TEXT NOT NULL,
                     amount REAL NOT NULL,
-                    occurred_at TEXT NOT NULL
+                    occurred_at TEXT NOT NULL,
+                    payee_id TEXT
                 );
                 CREATE INDEX IF NOT EXISTS transactions_account_time
                     ON transactions (account_id, occurred_at);
@@ -131,6 +139,10 @@ class GuardianStore:
                 CREATE INDEX IF NOT EXISTS alerts_id ON alerts (id);
                 """
             )
+            # Migración ligera: DBs creadas antes no tienen payee_id.
+            cols = [r[1] for r in connection.execute("PRAGMA table_info(transactions)").fetchall()]
+            if "payee_id" not in cols:
+                connection.execute("ALTER TABLE transactions ADD COLUMN payee_id TEXT")
 
     def _connect(self) -> sqlite3.Connection:
         connection = sqlite3.connect(self._database_path)

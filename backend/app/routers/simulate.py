@@ -5,10 +5,11 @@ from __future__ import annotations
 import asyncio
 from typing import Annotated
 
-from fastapi import APIRouter, Query, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Depends, Query, WebSocket, WebSocketDisconnect
 
 from app.models.schemas import RiskAlert, RiskAssessment, SimulationResult
 from app.risk_engine.state import AlertEvent
+from app.security import authorize_websocket, require_api_key
 from app.storage import guardian_store
 from scripts.simulate_stream import DEMO_ACCOUNT_ID, run_simulation
 
@@ -31,6 +32,7 @@ def _to_risk_alert(alert: AlertEvent) -> RiskAlert:
 @router.post("/run", response_model=SimulationResult)
 def run_demo_simulation(
     account_id: Annotated[str, Query(min_length=1, max_length=100)] = DEMO_ACCOUNT_ID,
+    _: None = Depends(require_api_key),
 ) -> SimulationResult:
     """Ejecuta movimientos de demostración y registra sus alertas."""
     return run_simulation(account_id=account_id)
@@ -39,6 +41,7 @@ def run_demo_simulation(
 @router.get("/alerts", response_model=list[RiskAlert])
 def list_alerts(
     limit: Annotated[int, Query(ge=1, le=100)] = 50,
+    _: None = Depends(require_api_key),
 ) -> list[RiskAlert]:
     """Devuelve las alertas más recientes, primero las de mayor recencia."""
     return [_to_risk_alert(alert) for alert in guardian_store.recent_alerts(limit)]
@@ -47,6 +50,8 @@ def list_alerts(
 @router.websocket("/alerts/stream")
 async def stream_alerts(websocket: WebSocket) -> None:
     """Envía alertas nuevas por WebSocket mientras la conexión esté activa."""
+    if not await authorize_websocket(websocket):
+        return
     await websocket.accept()
     last_alert_id = 0
     try:

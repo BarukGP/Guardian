@@ -26,6 +26,7 @@ class Settings:
     nessie_api_key: str
     nessie_base_url: str = "https://api.nessieisreal.com"
     nessie_timeout_seconds: float = 10.0
+    guardian_api_key: str = ""
 
 
 def get_settings() -> Settings:
@@ -40,7 +41,11 @@ def get_settings() -> Settings:
     if not base_url.startswith(("http://", "https://")):
         raise ConfigurationError("NESSIE_BASE_URL debe ser una URL HTTP(S) válida.")
 
-    return Settings(nessie_api_key=api_key, nessie_base_url=base_url.rstrip("/"))
+    return Settings(
+        nessie_api_key=api_key,
+        nessie_base_url=base_url.rstrip("/"),
+        guardian_api_key=os.getenv("GUARDIAN_API_KEY", "").strip(),
+    )
 
 
 def get_database_path() -> Path:

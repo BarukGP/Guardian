@@ -28,9 +28,11 @@ Crea `backend/.env` con estos valores:
 ```env
 NESSIE_API_KEY=tu_clave_de_nessie
 NESSIE_BASE_URL=https://api.nessieisreal.com
+GUARDIAN_API_KEY=una_clave_aleatoria_larga
 ```
 
 `NESSIE_BASE_URL` es opcional y, si se omite, usa esa misma URL por defecto.
+`GUARDIAN_API_KEY` protege las rutas operativas y nunca debe subirse al repositorio.
 
 ## Ejecutar el backend
 
@@ -59,6 +61,15 @@ La documentación interactiva queda disponible en `http://127.0.0.1:8000/docs`.
 
 Las rutas de Nessie devuelven `502` si el servicio externo no está disponible
 y `503` si falta la configuración local.
+
+Todas las rutas de cuentas, transacciones y simulación requieren este encabezado:
+
+```text
+X-Guardian-API-Key: <GUARDIAN_API_KEY>
+```
+
+La raíz (`GET /`) y la documentación (`/docs`) siguen siendo públicas. En Swagger,
+usa el botón **Authorize** para introducir la clave una vez por sesión.
 
 ## Motor de riesgo inicial
 
@@ -89,7 +100,8 @@ python scripts/simulate_stream.py
 ```
 
 Para recibir alertas nuevas en tiempo real, conecta un cliente WebSocket a
-`ws://127.0.0.1:8000/simulate/alerts/stream`.
+`ws://127.0.0.1:8000/simulate/alerts/stream` e incluye el encabezado
+`X-Guardian-API-Key`.
 
 ## Comprobar Nessie y cargar datos demo
 

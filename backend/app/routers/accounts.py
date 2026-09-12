@@ -9,9 +9,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.models.schemas import AccountCreate
 from app.nessie.client import NessieClient, NessieError
 from app.nessie.dependencies import get_nessie_client
+from app.security import require_api_key
 
 
-router = APIRouter(prefix="/accounts", tags=["accounts"])
+router = APIRouter(
+    prefix="/accounts", tags=["accounts"], dependencies=[Depends(require_api_key)]
+)
 
 
 @router.get("/customers/{customer_id}")

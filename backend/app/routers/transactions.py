@@ -10,10 +10,13 @@ from app.models.schemas import DepositCreate, DepositWithRisk
 from app.nessie.client import NessieClient, NessieError
 from app.nessie.dependencies import get_nessie_client
 from app.risk_engine.rules import assess_deposit
+from app.security import require_api_key
 from app.storage import guardian_store
 
 
-router = APIRouter(prefix="/transactions", tags=["transactions"])
+router = APIRouter(
+    prefix="/transactions", tags=["transactions"], dependencies=[Depends(require_api_key)]
+)
 
 
 @router.get("/accounts/{account_id}/deposits")

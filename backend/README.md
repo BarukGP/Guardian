@@ -56,7 +56,6 @@ ejecutarse de nuevo sin duplicar esos recursos.
 
 ## Estado de verificación
 
-Se implementó una comprobación autenticada mediante `NessieClient.healthcheck()`.
-Durante la última prueba de red, Nessie no respondió dentro del tiempo de espera.
-Si persiste, confirma que la URL configurada y la disponibilidad del servicio de
-Nessie sean correctas antes de ejecutar el seeder.
+Se verificó una conexión autenticada mediante `NessieClient.healthcheck()` y se
+ejecutó el seeder correctamente. La instancia configurada responde mediante
+HTTPS; usa `https://api.nessieisreal.com` como `NESSIE_BASE_URL`.

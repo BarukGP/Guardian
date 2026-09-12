@@ -32,8 +32,7 @@ Guardian/
 │       ├── app/                         # Arranque y estilos globales
 │       ├── features/                    # Autenticación, feed, casos y demo
 │       └── shared/                      # Cliente HTTP y utilidades reutilizables
-├── PRUEBAS_PILOTO_GUARDIAN.mk           # Guía para validar la demo
-└── ESTRUCTURA_PROYECTO.mk                # Detalle técnico de rutas y extensiones
+└── README.md                             # Guía del proyecto y ejecución
 ```
 
 ## Antes de iniciar
@@ -83,7 +82,7 @@ cd C:\Users\smyoi\Documents\Guardian\Guardian\api-service
 .\venv\Scripts\python.exe -m unittest discover -s tests -v
 ```
 
-Debe mostrar cinco pruebas y terminar en `OK`. Para una validación guiada de inicio de sesión, simulación, decisiones, casos y auditoría, sigue [PRUEBAS_PILOTO_GUARDIAN.mk](PRUEBAS_PILOTO_GUARDIAN.mk).
+Debe mostrar cinco pruebas y terminar en `OK`. Después, inicia sesión, ejecuta el escenario de estafa y verifica que la transferencia de alto riesgo quede en pausa antes de cancelarla, confirmarla o reportar presión.
 
 ## Criterios de organización
 

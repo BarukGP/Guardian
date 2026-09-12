@@ -6,9 +6,11 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.models.schemas import DepositCreate
+from app.models.schemas import DepositCreate, DepositWithRisk
 from app.nessie.client import NessieClient, NessieError
 from app.nessie.dependencies import get_nessie_client
+from app.risk_engine.rules import assess_deposit
+from app.risk_engine.state import risk_state
 
 
 router = APIRouter(prefix="/transactions", tags=["transactions"])
@@ -35,12 +37,16 @@ def create_deposit(
     account_id: str,
     deposit: DepositCreate,
     client: NessieClient = Depends(get_nessie_client),
-) -> dict[str, Any]:
-    """Registra un abono en Nessie."""
+) -> DepositWithRisk:
+    """Registra un abono y devuelve su evaluación de riesgo."""
     try:
-        return client.create_deposit(account_id, deposit.model_dump(mode="json"))
+        created_deposit = client.create_deposit(account_id, deposit.model_dump(mode="json"))
     except NessieError as exc:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail="No fue posible registrar el movimiento en Nessie.",
         ) from exc
+
+    assessment = assess_deposit(deposit.amount, risk_state.events_for(account_id))
+    risk_state.record(account_id, deposit.amount)
+    return DepositWithRisk(deposit=created_deposit, risk=assessment)

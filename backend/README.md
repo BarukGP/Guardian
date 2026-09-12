@@ -52,10 +52,23 @@ La documentación interactiva queda disponible en `http://127.0.0.1:8000/docs`.
 | `GET` | `/accounts/customers/{customer_id}` | Lista las cuentas de una cliente. |
 | `POST` | `/accounts/customers/{customer_id}` | Crea una cuenta. |
 | `GET` | `/transactions/accounts/{account_id}/deposits` | Lista los abonos de una cuenta. |
-| `POST` | `/transactions/accounts/{account_id}/deposits` | Registra un abono. |
+| `POST` | `/transactions/accounts/{account_id}/deposits` | Registra un abono y devuelve su riesgo. |
 
 Las rutas de Nessie devuelven `502` si el servicio externo no está disponible
 y `503` si falta la configuración local.
+
+## Motor de riesgo inicial
+
+Cada depósito creado pasa por reglas explicables y devuelve un puntaje de 0 a
+100, nivel (`low`, `medium` o `high`) y motivos. Las señales actuales son:
+
+- monto individual alto (10,000 o más);
+- actividad rápida (tres o más movimientos previos en 10 minutos);
+- volumen acumulado alto en 10 minutos; y
+- monto que excede tres veces el promedio de los últimos 30 días.
+
+El historial se conserva en memoria por proceso y hasta 30 días; es apropiado
+para el MVP, pero debe sustituirse por persistencia compartida antes de escalar.
 
 ## Comprobar Nessie y cargar datos demo
 

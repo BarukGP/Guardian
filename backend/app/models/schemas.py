@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import date
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -25,3 +25,18 @@ class DepositCreate(BaseModel):
     transaction_date: date
     amount: float = Field(gt=0)
     description: str = Field(min_length=1, max_length=255)
+
+
+class RiskAssessment(BaseModel):
+    """Resultado explicable de la evaluación de fraude."""
+
+    score: int = Field(ge=0, le=100)
+    level: Literal["low", "medium", "high"]
+    reasons: list[str]
+
+
+class DepositWithRisk(BaseModel):
+    """Depósito creado y la evaluación de riesgo asociada."""
+
+    deposit: dict[str, Any]
+    risk: RiskAssessment

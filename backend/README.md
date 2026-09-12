@@ -53,6 +53,8 @@ La documentación interactiva queda disponible en `http://127.0.0.1:8000/docs`.
 | `POST` | `/accounts/customers/{customer_id}` | Crea una cuenta. |
 | `GET` | `/transactions/accounts/{account_id}/deposits` | Lista los abonos de una cuenta. |
 | `POST` | `/transactions/accounts/{account_id}/deposits` | Registra un abono y devuelve su riesgo. |
+| `POST` | `/simulate/run` | Ejecuta la secuencia de demostración sin usar Nessie. |
+| `GET` | `/simulate/alerts` | Consulta las alertas recientes del proceso. |
 
 Las rutas de Nessie devuelven `502` si el servicio externo no está disponible
 y `503` si falta la configuración local.
@@ -69,6 +71,19 @@ Cada depósito creado pasa por reglas explicables y devuelve un puntaje de 0 a
 
 El historial se conserva en memoria por proceso y hasta 30 días; es apropiado
 para el MVP, pero debe sustituirse por persistencia compartida antes de escalar.
+
+## Simulación de fraude
+
+`POST /simulate/run` procesa ocho movimientos predefinidos: historial normal,
+actividad rápida, volumen alto y un monto alto. No crea recursos en Nessie y
+devuelve cada evaluación junto con el total de alertas generadas.
+
+Consulta las alertas con `GET /simulate/alerts` o ejecuta la simulación desde
+la terminal, estando en `backend`:
+
+```powershell
+python scripts/simulate_stream.py
+```
 
 ## Comprobar Nessie y cargar datos demo
 

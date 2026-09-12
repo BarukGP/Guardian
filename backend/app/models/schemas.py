@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime
 from typing import Any, Literal
 
 from pydantic import BaseModel, Field
@@ -40,3 +40,30 @@ class DepositWithRisk(BaseModel):
 
     deposit: dict[str, Any]
     risk: RiskAssessment
+
+
+class RiskAlert(BaseModel):
+    """Alerta persistida en memoria para mostrar actividad sospechosa."""
+
+    account_id: str
+    amount: float
+    risk: RiskAssessment
+    created_at: datetime
+
+
+class SimulatedTransaction(BaseModel):
+    """Movimiento generado durante una ejecución de demostración."""
+
+    amount: float
+    description: str
+    occurred_at: datetime
+    risk: RiskAssessment
+
+
+class SimulationResult(BaseModel):
+    """Resumen de una ejecución del simulador."""
+
+    account_id: str
+    processed: int
+    alerts_generated: int
+    transactions: list[SimulatedTransaction]

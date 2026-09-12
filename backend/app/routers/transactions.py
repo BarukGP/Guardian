@@ -10,7 +10,7 @@ from app.models.schemas import DepositCreate, DepositWithRisk
 from app.nessie.client import NessieClient, NessieError
 from app.nessie.dependencies import get_nessie_client
 from app.risk_engine.rules import assess_deposit
-from app.risk_engine.state import risk_state
+from app.risk_engine.state import alert_store, risk_state
 
 
 router = APIRouter(prefix="/transactions", tags=["transactions"])
@@ -49,4 +49,12 @@ def create_deposit(
 
     assessment = assess_deposit(deposit.amount, risk_state.events_for(account_id))
     risk_state.record(account_id, deposit.amount)
+    if assessment.level != "low":
+        alert_store.record(
+            account_id=account_id,
+            amount=deposit.amount,
+            score=assessment.score,
+            level=assessment.level,
+            reasons=assessment.reasons,
+        )
     return DepositWithRisk(deposit=created_deposit, risk=assessment)

@@ -15,6 +15,16 @@ class TransactionEvent:
     occurred_at: datetime
 
 
+@dataclass(frozen=True, slots=True)
+class AlertEvent:
+    account_id: str
+    amount: float
+    score: int
+    level: str
+    reasons: tuple[str, ...]
+    created_at: datetime
+
+
 class RiskState:
     """Mantiene un historial acotado en memoria; no reemplaza persistencia."""
 
@@ -52,3 +62,43 @@ class RiskState:
 
 
 risk_state = RiskState()
+
+
+class AlertStore:
+    """Mantiene las alertas recientes para la demostración del MVP."""
+
+    def __init__(self, max_alerts: int = 500) -> None:
+        self._alerts: deque[AlertEvent] = deque(maxlen=max_alerts)
+        self._lock = Lock()
+
+    def record(
+        self,
+        account_id: str,
+        amount: float,
+        score: int,
+        level: str,
+        reasons: list[str],
+        now: datetime | None = None,
+    ) -> None:
+        created_at = now or datetime.now(timezone.utc)
+        alert = AlertEvent(
+            account_id=account_id,
+            amount=amount,
+            score=score,
+            level=level,
+            reasons=tuple(reasons),
+            created_at=created_at,
+        )
+        with self._lock:
+            self._alerts.append(alert)
+
+    def recent(self, limit: int = 50) -> list[AlertEvent]:
+        with self._lock:
+            return list(reversed(self._alerts))[:limit]
+
+    def clear(self) -> None:
+        with self._lock:
+            self._alerts.clear()
+
+
+alert_store = AlertStore()

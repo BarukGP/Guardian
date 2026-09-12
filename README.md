@@ -37,13 +37,7 @@ Guardian/
 
 ## Antes de iniciar
 
-Trabaja desde la raíz:
-
-```powershell
-cd C:\Users\smyoi\Documents\Guardian\Guardian
-```
-
-Crea `C:\Users\smyoi\Documents\Guardian\Guardian\api-service\.env` a partir de `api-service\.env.example`. Para el piloto necesitas una contraseña local de al menos ocho caracteres:
+Después de clonar el repositorio, abre una terminal en su carpeta raíz. Crea `api-service/.env` a partir de `api-service/.env.example`. Para el piloto necesitas una contraseña local de al menos ocho caracteres:
 
 ```env
 GUARDIAN_DEMO_PASSWORD=elige_una_contrasena_local_segura
@@ -58,7 +52,7 @@ Abre dos terminales.
 Primera terminal — API:
 
 ```powershell
-cd C:\Users\smyoi\Documents\Guardian\Guardian\api-service
+cd api-service
 .\venv\Scripts\python.exe -m uvicorn main:app --reload
 ```
 
@@ -67,7 +61,7 @@ La documentación interactiva queda disponible en [http://127.0.0.1:8000/docs](h
 Segunda terminal — interfaz:
 
 ```powershell
-cd C:\Users\smyoi\Documents\Guardian\Guardian\web-client
+cd web-client
 npm run dev
 ```
 
@@ -78,7 +72,7 @@ Abre la dirección que muestre Vite, normalmente [http://localhost:5173](http://
 Con la API detenida o en otra terminal, ejecuta las pruebas del servicio:
 
 ```powershell
-cd C:\Users\smyoi\Documents\Guardian\Guardian\api-service
+cd api-service
 .\venv\Scripts\python.exe -m unittest discover -s tests -v
 ```
 

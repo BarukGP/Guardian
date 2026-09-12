@@ -1,0 +1,22 @@
+:root { font-family: Inter, system-ui, sans-serif; color: #eef2ff; background: #07111f; }
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; min-height: 100vh; }
+.shell { min-height: 100vh; display: grid; place-items: center; padding: 2rem; }
+.hero { width: min(900px, 100%); padding: 3rem; border: 1px solid #243349; border-radius: 24px; background: #0d1b2e; }
+.eyebrow { letter-spacing: .14em; font-size: .78rem; color: #7dd3fc; }
+h1 { font-size: clamp(2.4rem, 7vw, 5.5rem); line-height: .95; margin: 1rem 0; }
+.subtitle { max-width: 650px; color: #a9b7c9; font-size: 1.1rem; }
+.status { display: inline-flex; gap: .6rem; align-items: center; margin-top: 1.5rem; padding: .7rem 1rem; border-radius: 999px; background: #13243b; }
+.status span { width: 10px; height: 10px; border-radius: 50%; background: #facc15; }
+
+.status.connected span {
+  background: #22c55e;
+}
+
+.status.error span {
+  background: #ef4444;
+}
+
+.status.checking span {
+  background: #facc15;
+}

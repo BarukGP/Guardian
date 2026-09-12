@@ -42,6 +42,21 @@ python -m uvicorn main:app --reload
 
 El endpoint inicial queda disponible en `http://127.0.0.1:8000/`.
 
+La documentación interactiva queda disponible en `http://127.0.0.1:8000/docs`.
+
+## Endpoints disponibles
+
+| Método | Ruta | Descripción |
+| --- | --- | --- |
+| `GET` | `/` | Estado del backend. |
+| `GET` | `/accounts/customers/{customer_id}` | Lista las cuentas de una cliente. |
+| `POST` | `/accounts/customers/{customer_id}` | Crea una cuenta. |
+| `GET` | `/transactions/accounts/{account_id}/deposits` | Lista los abonos de una cuenta. |
+| `POST` | `/transactions/accounts/{account_id}/deposits` | Registra un abono. |
+
+Las rutas de Nessie devuelven `502` si el servicio externo no está disponible
+y `503` si falta la configuración local.
+
 ## Comprobar Nessie y cargar datos demo
 
 Con las dependencias instaladas y el `.env` configurado, ejecuta:

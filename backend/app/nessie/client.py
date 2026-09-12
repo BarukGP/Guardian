@@ -62,6 +62,12 @@ class NessieClient:
             self._request("POST", f"/accounts/{account_id}/deposits", json=deposit)
         )
 
+    def list_deposits(self, account_id: str) -> list[dict[str, Any]]:
+        data = self._request("GET", f"/accounts/{account_id}/deposits")
+        if not isinstance(data, list):
+            raise NessieError("Nessie devolvió una respuesta de depósitos inesperada.")
+        return data
+
     @staticmethod
     def _created_object(data: Any) -> dict[str, Any]:
         """Extrae el recurso de la envoltura de creación de Nessie."""

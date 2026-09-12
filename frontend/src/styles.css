@@ -8,3 +8,15 @@ h1 { font-size: clamp(2.4rem, 7vw, 5.5rem); line-height: .95; margin: 1rem 0; }
 .subtitle { max-width: 650px; color: #a9b7c9; font-size: 1.1rem; }
 .status { display: inline-flex; gap: .6rem; align-items: center; margin-top: 1.5rem; padding: .7rem 1rem; border-radius: 999px; background: #13243b; }
 .status span { width: 10px; height: 10px; border-radius: 50%; background: #facc15; }
+
+.status.connected span {
+  background: #22c55e;
+}
+
+.status.error span {
+  background: #ef4444;
+}
+
+.status.checking span {
+  background: #facc15;
+}

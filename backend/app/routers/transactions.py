@@ -10,7 +10,7 @@ from app.models.schemas import DepositCreate, DepositWithRisk
 from app.nessie.client import NessieClient, NessieError
 from app.nessie.dependencies import get_nessie_client
 from app.risk_engine.rules import assess_deposit
-from app.risk_engine.state import alert_store, risk_state
+from app.storage import guardian_store
 
 
 router = APIRouter(prefix="/transactions", tags=["transactions"])
@@ -47,14 +47,20 @@ def create_deposit(
             detail="No fue posible registrar el movimiento en Nessie.",
         ) from exc
 
-    assessment = assess_deposit(deposit.amount, risk_state.events_for(account_id))
-    risk_state.record(account_id, deposit.amount)
+    from datetime import datetime, timezone
+
+    occurred_at = datetime.now(timezone.utc)
+    assessment = assess_deposit(
+        deposit.amount, guardian_store.events_for(account_id, occurred_at), occurred_at
+    )
+    guardian_store.record_transaction(account_id, deposit.amount, occurred_at)
     if assessment.level != "low":
-        alert_store.record(
+        guardian_store.record_alert(
             account_id=account_id,
             amount=deposit.amount,
             score=assessment.score,
             level=assessment.level,
             reasons=assessment.reasons,
+            created_at=occurred_at,
         )
     return DepositWithRisk(deposit=created_deposit, risk=assessment)

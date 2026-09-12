@@ -22,6 +22,7 @@ class DepositCreate(BaseModel):
     """Movimiento de abono para una cuenta."""
 
     medium: Literal["balance", "cash", "check", "transfer"]
+    status: Literal["pending", "completed", "cancelled"] = "completed"
     transaction_date: date
     amount: float = Field(gt=0)
     description: str = Field(min_length=1, max_length=255)
@@ -45,6 +46,7 @@ class DepositWithRisk(BaseModel):
 class RiskAlert(BaseModel):
     """Alerta persistida en memoria para mostrar actividad sospechosa."""
 
+    id: int
     account_id: str
     amount: float
     risk: RiskAssessment

@@ -7,14 +7,15 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
 
-from app.models.schemas import RiskAlert, SimulatedTransaction, SimulationResult
+from app.models.schemas import SimulatedTransaction, SimulationResult
 from app.risk_engine.rules import assess_deposit
-from app.risk_engine.state import AlertStore, RiskState, alert_store
+from app.risk_engine.state import RiskState
+from app.storage import GuardianStore, guardian_store
 
 
 DEMO_ACCOUNT_ID = "guardian-demo-simulation"
 DEMO_EVENTS = (
-    (timedelta(days=-30), 120.0, "Depósito histórico"),
+    (timedelta(days=-29), 120.0, "Depósito histórico"),
     (timedelta(days=-15), 100.0, "Depósito histórico"),
     (timedelta(days=-1), 110.0, "Depósito habitual"),
     (timedelta(minutes=-4), 200.0, "Abono rápido 1"),
@@ -29,12 +30,12 @@ def run_simulation(
     account_id: str = DEMO_ACCOUNT_ID,
     now: datetime | None = None,
     state: RiskState | None = None,
-    alerts: AlertStore | None = None,
+    store: GuardianStore | None = None,
 ) -> SimulationResult:
     """Procesa una secuencia fija y devuelve todas sus evaluaciones."""
     reference_time = now or datetime.now(timezone.utc)
     simulation_state = state if state is not None else RiskState()
-    alert_target = alerts if alerts is not None else alert_store
+    persistence = store if store is not None else guardian_store
     transactions: list[SimulatedTransaction] = []
     alerts_generated = 0
 
@@ -44,6 +45,7 @@ def run_simulation(
             amount, simulation_state.events_for(account_id, occurred_at), occurred_at
         )
         simulation_state.record(account_id, amount, occurred_at)
+        persistence.record_transaction(account_id, amount, occurred_at)
         transactions.append(
             SimulatedTransaction(
                 amount=amount,
@@ -53,13 +55,13 @@ def run_simulation(
             )
         )
         if assessment.level != "low":
-            alert_target.record(
+            persistence.record_alert(
                 account_id=account_id,
                 amount=amount,
                 score=assessment.score,
                 level=assessment.level,
                 reasons=assessment.reasons,
-                now=occurred_at,
+                created_at=occurred_at,
             )
             alerts_generated += 1
 

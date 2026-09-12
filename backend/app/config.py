@@ -41,3 +41,9 @@ def get_settings() -> Settings:
         raise ConfigurationError("NESSIE_BASE_URL debe ser una URL HTTP(S) válida.")
 
     return Settings(nessie_api_key=api_key, nessie_base_url=base_url.rstrip("/"))
+
+
+def get_database_path() -> Path:
+    """Devuelve la ruta local para la persistencia SQLite del MVP."""
+    configured_path = os.getenv("GUARDIAN_DATABASE_PATH", "").strip()
+    return Path(configured_path) if configured_path else BACKEND_DIR / "data" / "guardian.db"

@@ -54,7 +54,8 @@ La documentación interactiva queda disponible en `http://127.0.0.1:8000/docs`.
 | `GET` | `/transactions/accounts/{account_id}/deposits` | Lista los abonos de una cuenta. |
 | `POST` | `/transactions/accounts/{account_id}/deposits` | Registra un abono y devuelve su riesgo. |
 | `POST` | `/simulate/run` | Ejecuta la secuencia de demostración sin usar Nessie. |
-| `GET` | `/simulate/alerts` | Consulta las alertas recientes del proceso. |
+| `GET` | `/simulate/alerts` | Consulta alertas persistidas en SQLite. |
+| `WS` | `/simulate/alerts/stream` | Envía alertas nuevas en tiempo real. |
 
 Las rutas de Nessie devuelven `502` si el servicio externo no está disponible
 y `503` si falta la configuración local.
@@ -69,8 +70,10 @@ Cada depósito creado pasa por reglas explicables y devuelve un puntaje de 0 a
 - volumen acumulado alto en 10 minutos; y
 - monto que excede tres veces el promedio de los últimos 30 días.
 
-El historial se conserva en memoria por proceso y hasta 30 días; es apropiado
-para el MVP, pero debe sustituirse por persistencia compartida antes de escalar.
+Los movimientos y alertas se guardan localmente en `backend/data/guardian.db`.
+La ruta se puede cambiar con `GUARDIAN_DATABASE_PATH`. SQLite es apropiado para
+el MVP de una instancia; antes de escalar debe sustituirse por una base de datos
+compartida.
 
 ## Simulación de fraude
 
@@ -84,6 +87,9 @@ la terminal, estando en `backend`:
 ```powershell
 python scripts/simulate_stream.py
 ```
+
+Para recibir alertas nuevas en tiempo real, conecta un cliente WebSocket a
+`ws://127.0.0.1:8000/simulate/alerts/stream`.
 
 ## Comprobar Nessie y cargar datos demo
 

@@ -6,3 +6,120 @@
   --font-sans: "Manrope Variable", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "DM Mono", ui-monospace, monospace;
 }
+
+/* ── Tema claro · Paleta 1 · Confianza y Calma ─────────────────────────── */
+:root {
+  --bg:             #F8FAFC;
+  --surface:        #FFFFFF;
+  --surface-2:      #F8FAFC;
+  --border:         #E2E8F0;
+  --border-strong:  #CBD5E1;
+  --text:           #0F172A;
+  --text-muted:     #64748B;
+  --text-soft:      #94A3B8;
+  --primary:        #1E40AF;
+  --primary-hover:  #1D4ED8;
+  --primary-light:  #EFF6FF;
+  --primary-text:   #1E40AF;
+  --alert:          #D97706;
+  --alert-light:    #FFFBEB;
+  --alert-border:   #FDE68A;
+  --alert-text:     #92400E;
+  --safe:           #059669;
+  --safe-light:     #ECFDF5;
+  --safe-border:    #A7F3D0;
+  --safe-text:      #065F46;
+  --high:           #B45309;
+  --high-light:     #FFF7ED;
+  --high-border:    #FED7AA;
+  --high-text:      #92400E;
+  --shadow:         0 1px 3px rgba(15,23,42,0.08), 0 1px 2px rgba(15,23,42,0.04);
+  --shadow-lg:      0 10px 25px rgba(15,23,42,0.08);
+}
+
+/* ── Tema oscuro · Paleta 3 · Modo Oscuro Alta Claridad ────────────────── */
+.dark {
+  --bg:             #0B0F19;
+  --surface:        #111827;
+  --surface-2:      #0B0F19;
+  --border:         #1F2937;
+  --border-strong:  #374151;
+  --text:           #F3F4F6;
+  --text-muted:     #9CA3AF;
+  --text-soft:      #6B7280;
+  --primary:        #3B82F6;
+  --primary-hover:  #2563EB;
+  --primary-light:  rgba(59,130,246,0.12);
+  --primary-text:   #93C5FD;
+  --alert:          #FBBF24;
+  --alert-light:    rgba(251,191,36,0.10);
+  --alert-border:   rgba(251,191,36,0.25);
+  --alert-text:     #FDE68A;
+  --safe:           #34D399;
+  --safe-light:     rgba(52,211,153,0.10);
+  --safe-border:    rgba(52,211,153,0.25);
+  --safe-text:      #6EE7B7;
+  --high:           #F87171;
+  --high-light:     rgba(248,113,113,0.10);
+  --high-border:    rgba(248,113,113,0.25);
+  --high-text:      #FCA5A5;
+  --shadow:         0 1px 3px rgba(0,0,0,0.40);
+  --shadow-lg:      0 10px 25px rgba(0,0,0,0.50);
+}
+
+/* ── Utilidades de tema ─────────────────────────────────────────────────── */
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.t-bg         { background-color: var(--bg); }
+.t-surface    { background-color: var(--surface); }
+.t-surface-2  { background-color: var(--surface-2); }
+.t-border     { border-color: var(--border); }
+.t-border-strong { border-color: var(--border-strong); }
+.t-text       { color: var(--text); }
+.t-muted      { color: var(--text-muted); }
+.t-soft       { color: var(--text-soft); }
+
+.t-primary-bg    { background-color: var(--primary); }
+.t-primary-text  { color: var(--primary); }
+.t-primary-light { background-color: var(--primary-light); }
+
+.t-alert-bg     { background-color: var(--alert-light); }
+.t-alert-border { border-color: var(--alert-border); }
+.t-alert-text   { color: var(--alert-text); }
+.t-alert-accent { color: var(--alert); }
+
+.t-safe-bg     { background-color: var(--safe-light); }
+.t-safe-border { border-color: var(--safe-border); }
+.t-safe-text   { color: var(--safe-text); }
+.t-safe-accent { color: var(--safe); }
+
+.t-high-bg     { background-color: var(--high-light); }
+.t-high-border { border-color: var(--high-border); }
+.t-high-text   { color: var(--high-text); }
+.t-high-accent { color: var(--high); }
+
+.t-shadow    { box-shadow: var(--shadow); }
+.t-shadow-lg { box-shadow: var(--shadow-lg); }
+
+/* ── Transición suave en todos los elementos temáticos ─────────────────── */
+*, *::before, *::after {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: 0.2s;
+  transition-timing-function: ease;
+}
+/* Excepciones: no animar transform ni opacity con la transición global */
+.no-theme-transition,
+.no-theme-transition * {
+  transition: none !important;
+}
+
+* { scroll-behavior: smooth; }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-soft); }

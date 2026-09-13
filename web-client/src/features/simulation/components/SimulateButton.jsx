@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FlaskConical } from 'lucide-react'
+import { FlaskConical, Zap } from 'lucide-react'
 import { runSimulation } from '../../../shared/api/client.js'
 import { cn } from '../../../shared/lib/ui.js'
 
@@ -32,18 +32,25 @@ export function SimulateButton({ onDone }) {
         onClick={handleClick}
         disabled={running}
         className={cn(
-          'w-full rounded-xl px-5 py-3.5 font-sans text-sm font-bold text-slate-950',
-          'bg-amber-300 hover:bg-amber-200 disabled:opacity-60 disabled:cursor-wait',
-          'transition-all duration-300 ease-out active:scale-[0.98]',
-          'flex items-center justify-center gap-2',
+          'w-full rounded-xl px-4 py-3 font-sans text-sm font-bold text-white',
+          'disabled:opacity-60 disabled:cursor-wait',
+          'transition-all duration-200 active:scale-[0.98]',
+          'flex items-center justify-center gap-2 no-theme-transition',
         )}
+        style={{
+          backgroundColor: 'var(--primary)',
+          boxShadow: '0 4px 14px color-mix(in srgb, var(--primary) 20%, transparent)',
+        }}
+        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--primary-hover)' }}
+        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'var(--primary)' }}
       >
-        <FlaskConical className={cn('size-4', running && 'animate-spin')} />
-        {running ? 'Simulando movimientos…' : 'Simular escenario de estafa'}
+        {running ? (
+          <><FlaskConical className="size-4 animate-spin" /> Simulando…</>
+        ) : (
+          <><Zap className="size-4" /> Simular escenario de estafa</>
+        )}
       </button>
-      {error && (
-        <p className="font-sans text-xs text-rose-400 mt-2 text-center">{error}</p>
-      )}
+      {error && <p className="text-xs t-high-text mt-1.5 text-center">{error}</p>}
     </div>
   )
 }

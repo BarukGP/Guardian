@@ -7,3 +7,4 @@ web-client/.env
 __pycache__/
 *.pyc
 *.pyo
+.vscode/

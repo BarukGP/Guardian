@@ -5,27 +5,31 @@ export function cn(...inputs) {
   return twMerge(clsx(inputs))
 }
 
+// LEVEL_STYLES usa variables CSS de tema → funciona en light y dark automáticamente
 export const LEVEL_STYLES = {
   low: {
-    text: 'text-emerald-400',
-    bg: 'bg-emerald-950/40',
-    border: 'border-emerald-800/40',
-    dot: 'bg-emerald-400',
-    label: 'Normal',
+    text:   't-safe-accent',
+    bg:     't-safe-bg',
+    border: 't-safe-border',
+    dot:    'bg-[var(--safe)]',
+    label:  'Normal',
+    pill:   't-safe-bg t-safe-border t-safe-accent',
   },
   medium: {
-    text: 'text-amber-400',
-    bg: 'bg-amber-950/40',
-    border: 'border-amber-800/40',
-    dot: 'bg-amber-400',
-    label: 'Revisar',
+    text:   't-alert-accent',
+    bg:     't-alert-bg',
+    border: 't-alert-border',
+    dot:    'bg-[var(--alert)]',
+    label:  'Revisar',
+    pill:   't-alert-bg t-alert-border t-alert-accent',
   },
   high: {
-    text: 'text-rose-400',
-    bg: 'bg-rose-950/40',
-    border: 'border-rose-800/40',
-    dot: 'bg-rose-400',
-    label: '¡Cuidado!',
+    text:   't-high-accent',
+    bg:     't-high-bg',
+    border: 't-high-border',
+    dot:    'bg-[var(--high)]',
+    label:  '¡Alerta!',
+    pill:   't-high-bg t-high-border t-high-accent',
   },
 }
 
@@ -44,6 +48,18 @@ export function formatTime(iso) {
       month: 'short',
       hour: '2-digit',
       minute: '2-digit',
+    }).format(new Date(iso))
+  } catch {
+    return iso
+  }
+}
+
+export function formatTimeShort(iso) {
+  try {
+    return new Intl.DateTimeFormat('es-MX', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
     }).format(new Date(iso))
   } catch {
     return iso

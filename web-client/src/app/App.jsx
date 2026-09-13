@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Activity, BadgeAlert, LayoutDashboard, TriangleAlert } from 'lucide-react'
 import { Header } from '../features/dashboard/components/Header.jsx'
 import { StatusSummary } from '../features/dashboard/components/StatusSummary.jsx'
@@ -111,9 +111,18 @@ function Dashboard({ user, onLogout, dark, onToggleTheme }) {
   const highCount      = useMemo(() => operations.filter((op) => op?.risk?.level === 'high').length, [operations])
   const openCaseCount  = useMemo(() => cases.filter((c) => c.status === 'open').length, [cases])
 
+  // Solo redirige al Panel cuando aparece una pausa NUEVA (null → id concreto).
+  // No redirige en cada re-render del poll, evitando el bug de "rebote de pestaña".
+  const prevPendingIdRef = useRef(null)
   useEffect(() => {
-    if (pendingReview && user.role === 'customer') setActiveTab('dashboard')
-  }, [pendingReview, user.role])
+    const currentId = pendingReview?.id ?? null
+    const prevId    = prevPendingIdRef.current
+    // Hubo una nueva pausa que antes no existía
+    if (currentId !== null && prevId === null && user.role === 'customer') {
+      setActiveTab('dashboard')
+    }
+    prevPendingIdRef.current = currentId
+  }, [pendingReview?.id, user.role])
 
   return (
     <div className="min-h-screen t-bg font-sans antialiased">
